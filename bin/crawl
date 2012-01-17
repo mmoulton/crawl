@@ -1,0 +1,125 @@
+#!/usr/bin/env node
+
+/*!
+ * Crawl - crawl CLI
+ * Copyright(c) 2012 Mike Moulton <mike@meltmedia.com>
+ * MIT Licensed
+ */
+
+var optimist = require('optimist')
+    .usage('Crawl and difference websites.\nUsage: $0 left [right]', {
+      'v': {
+        'type': 'boolean',
+        'description': 'Verbose logging',
+        'alias': 'verbose'
+      },
+      'j': {
+        'type': 'boolean',
+        'description': 'Output results in JSON format',
+        'alias': 'json'
+      },
+      'h': {
+        'type': 'boolean',
+        'description': 'Include the raw response headers in the results',
+        'alias': 'headers'
+      },
+      'b': {
+        'type': 'boolean',
+        'description': 'Include the raw response body in the results',
+        'alias': 'body'
+      },
+      'p': {
+        'type': 'boolean',
+        'description': 'Generate a patch of the left into the right',
+        'alias': 'patch'
+      }
+    })
+    .check(function(argv) {
+      var left = [0];
+      if (!argv._.length) {
+        throw 'You must define at least one path to crawl.';
+      }
+    });
+
+var crawler = require('../lib/crawler'),
+    differencer = require('../lib/differencer'),
+    fs = require('fs'),
+    util = require('util'),
+    colors = require('colors'),
+    _ = require('underscore'),
+    prettyjson = require('prettyjson');
+
+var argv = optimist.argv,
+    left = argv._[0],
+    right = argv._[1];
+
+if (argv.v) {
+  crawler.on("crawl", function(page) {
+    console.log("Crawling: ".grey + "%s".yellow, page);
+  });
+}
+
+// Differencing two sites
+if (left && right) {
+
+  differencer.diff(left, right, { headers: argv.h, body: argv.b || argv.p }, function(err, leftPages, rightPages, diffs) {
+
+    if (err) {
+      console.log("An error occured: " + err);
+      process.exit(1);
+    }
+
+    // output results in json format
+    if (argv.j) {
+      console.log(JSON.stringify(diffs));
+    }
+
+    // output pretty diff results
+    else {
+      console.log("\n");
+      console.log("%s\t\t\t\t\t\t\tMATCH\t\t\t\t\t\t\t%s".bold.white, left, right);
+      for (var i = 0; i < left.length; i++) { process.stdout.write("-"); }
+      process.stdout.write("\t\t\t\t\t\t\t-----\t\t\t\t\t\t\t");
+      for (var i = 0; i < right.length; i++) { process.stdout.write("-"); }
+      console.log("\n");
+
+      _.each(diffs, function(value, key, list) {
+        var msg = "";
+        if (value.left.url && value.right.url) {
+          msg = "\t\t\t\t\t\t\t" + key;
+          msg = (value.differences) ? msg.red : msg.green;
+        } else if (value.left.url && !value.right.url) {
+          msg = key.cyan;
+        } else if (!value.left.url && value.right.url) {
+          msg = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + key.magenta;
+        }
+        console.log(msg);
+      });
+    }
+
+  });  
+
+}
+
+// Simply crawling a site, no diff
+else if (left && !right) {
+
+  crawler.crawl(left, { headers: argv.h, body: argv.b }, function(err, leftPages) {
+
+    if (err) {
+      console.log("An error occured: " + err);
+      process.exit(1);
+    }
+
+    // output json
+    if (argv.j) {
+      console.log(JSON.stringify(leftPages));
+    }
+
+    // output pretty results
+    else {
+      console.log("Crawl results: \n".grey + prettyjson.render(leftPages));    
+    }
+  });
+
+}
