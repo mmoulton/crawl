@@ -1,5 +1,11 @@
 # Crawl - a website crawler / differencer
 
+## Install
+
+   npm install crawl -g
+
+## Usage
+
 	Usage: crawl left [right]
 
 	Options:
