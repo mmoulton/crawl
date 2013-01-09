@@ -28,10 +28,15 @@ var optimist = require('optimist')
         'description': 'Include the raw response body in the results',
         'alias': 'body'
       },
+      'u': {
+        'type': 'string',
+        'description': 'HTTP Basic Auth Username',
+        'alias': 'username'
+      },
       'p': {
-        'type': 'boolean',
-        'description': 'Generate a patch of the left into the right',
-        'alias': 'patch'
+        'type': 'string',
+        'description': 'HTTP Basic Auth Password',
+        'alias': 'password'
       }
     })
     .check(function(argv) {
@@ -45,6 +50,7 @@ var crawler = require('../lib/crawler'),
     differencer = require('../lib/differencer'),
     fs = require('fs'),
     util = require('util'),
+    urlUtil = require('url'),
     colors = require('colors'),
     _ = require('underscore'),
     prettyjson = require('prettyjson');
@@ -62,7 +68,9 @@ if (argv.v) {
 // Differencing two sites
 if (left && right) {
 
-  differencer.diff(left, right, { headers: argv.h, body: argv.b || argv.p }, function(err, leftPages, rightPages, diffs) {
+  differencer.diff(left, right,
+    { headers: argv.h, body: argv.b, username: argv.u, password: argv.p },
+    function(err, leftPages, rightPages, diffs) {
 
     if (err) {
       console.log("An error occured: " + err);
@@ -84,14 +92,15 @@ if (left && right) {
       console.log("\n");
 
       _.each(diffs, function(value, key, list) {
-        var msg = "";
+        var msg = "",
+            urlParts = urlUtil.parse(key, true);
         if (value.left.url && value.right.url) {
-          msg = "\t\t\t\t\t\t\t" + key;
+          msg = "\t\t\t\t\t\t\t" + urlParts.path;
           msg = (value.differences) ? msg.red : msg.green;
         } else if (value.left.url && !value.right.url) {
-          msg = key.cyan;
+          msg = urlParts.path.cyan;
         } else if (!value.left.url && value.right.url) {
-          msg = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + key.magenta;
+          msg = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + urlParts.path.magenta;
         }
         console.log(msg);
       });
@@ -104,7 +113,9 @@ if (left && right) {
 // Simply crawling a site, no diff
 else if (left && !right) {
 
-  crawler.crawl(left, { headers: argv.h, body: argv.b }, function(err, leftPages) {
+  crawler.crawl(left,
+    { headers: argv.h, body: argv.b, username: argv.u, password: argv.p },
+    function(err, leftPages) {
 
     if (err) {
       console.log("An error occured: " + err);
