@@ -28,10 +28,15 @@ var optimist = require('optimist')
         'description': 'Include the raw response body in the results',
         'alias': 'body'
       },
+      'u': {
+        'type': 'string',
+        'description': 'HTTP Basic Auth Username',
+        'alias': 'username'
+      },
       'p': {
-        'type': 'boolean',
-        'description': 'Generate a patch of the left into the right',
-        'alias': 'patch'
+        'type': 'string',
+        'description': 'HTTP Basic Auth Password',
+        'alias': 'password'
       }
     })
     .check(function(argv) {
@@ -62,7 +67,9 @@ if (argv.v) {
 // Differencing two sites
 if (left && right) {
 
-  differencer.diff(left, right, { headers: argv.h, body: argv.b || argv.p }, function(err, leftPages, rightPages, diffs) {
+  differencer.diff(left, right,
+    { headers: argv.h, body: argv.b, username: argv.u, password: argv.p },
+    function(err, leftPages, rightPages, diffs) {
 
     if (err) {
       console.log("An error occured: " + err);
@@ -104,7 +111,9 @@ if (left && right) {
 // Simply crawling a site, no diff
 else if (left && !right) {
 
-  crawler.crawl(left, { headers: argv.h, body: argv.b }, function(err, leftPages) {
+  crawler.crawl(left,
+    { headers: argv.h, body: argv.b, username: argv.u, password: argv.p },
+    function(err, leftPages) {
 
     if (err) {
       console.log("An error occured: " + err);

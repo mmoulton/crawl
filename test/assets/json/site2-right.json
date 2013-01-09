@@ -1,9 +1,5 @@
 [{
-  "url": {
-    "authority":"meltmedia.com",
-    "protocol":"http",
-    "relative":"/"
-  },
+  "url": "http://meltmedia.com/",
   "checksum":"309f1177771c9213a3b0db3738e3535b6afec722c9818e793fef652c12905224",
   "links":[],
   "date":"2012-01-12T19:17:04.892Z"
