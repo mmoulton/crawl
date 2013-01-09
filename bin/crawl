@@ -50,6 +50,7 @@ var crawler = require('../lib/crawler'),
     differencer = require('../lib/differencer'),
     fs = require('fs'),
     util = require('util'),
+    urlUtil = require('url'),
     colors = require('colors'),
     _ = require('underscore'),
     prettyjson = require('prettyjson');
@@ -91,14 +92,15 @@ if (left && right) {
       console.log("\n");
 
       _.each(diffs, function(value, key, list) {
-        var msg = "";
+        var msg = "",
+            urlParts = urlUtil.parse(key, true);
         if (value.left.url && value.right.url) {
-          msg = "\t\t\t\t\t\t\t" + key;
+          msg = "\t\t\t\t\t\t\t" + urlParts.path;
           msg = (value.differences) ? msg.red : msg.green;
         } else if (value.left.url && !value.right.url) {
-          msg = key.cyan;
+          msg = urlParts.path.cyan;
         } else if (!value.left.url && value.right.url) {
-          msg = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + key.magenta;
+          msg = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t" + urlParts.path.magenta;
         }
         console.log(msg);
       });
