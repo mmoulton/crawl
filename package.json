@@ -1,7 +1,7 @@
 {
   "name": "crawl",
   "description": "Website crawler and differencer",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "author": "Mike Moulton <mike@meltmedia.com>",
   "contributors": [ 
     { "name": "Nick Crohn", "email": "nick@meltmedia.com" }
