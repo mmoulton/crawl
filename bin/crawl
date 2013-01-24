@@ -13,12 +13,12 @@ var optimist = require('optimist')
         'description': 'Verbose logging',
         'alias': 'verbose'
       },
-      'j': {
+      'P': {
         'type': 'boolean',
-        'description': 'Output results in JSON format',
-        'alias': 'json'
+        'description': 'Pretty print the results',
+        'alias': 'pretty'
       },
-      'h': {
+      'H': {
         'type': 'boolean',
         'description': 'Include the raw response headers in the results',
         'alias': 'headers'
@@ -61,7 +61,8 @@ var argv = optimist.argv,
 
 if (argv.v) {
   crawler.on("crawl", function(page) {
-    console.log("Crawling: ".grey + "%s".yellow, page);
+    // log to stderr so we can still pipe stdout to stdin of other tools
+    console.error("Crawling: ".grey + "%s".yellow, page);
   });
 }
 
@@ -69,21 +70,18 @@ if (argv.v) {
 if (left && right) {
 
   differencer.diff(left, right,
-    { headers: argv.h, body: argv.b, username: argv.u, password: argv.p },
+    { headers: argv.H, body: argv.b, username: argv.u, password: argv.p },
     function(err, leftPages, rightPages, diffs) {
 
     if (err) {
-      console.log("An error occured: " + err);
+      console.error("An error occured: " + err);
       process.exit(1);
     }
 
     // output results in json format
-    if (argv.j) {
-      console.log(JSON.stringify(diffs));
-    }
 
     // output pretty diff results
-    else {
+    if (argv.P) {
       console.log("\n");
       console.log("%s\t\t\t\t\t\t\tMATCH\t\t\t\t\t\t\t%s".bold.white, left, right);
       for (var i = 0; i < left.length; i++) { process.stdout.write("-"); }
@@ -106,6 +104,11 @@ if (left && right) {
       });
     }
 
+    // JSON Results
+    else {
+      process.stdout.write(JSON.stringify(diffs, null, 2));
+    }
+
   });  
 
 }
@@ -114,23 +117,24 @@ if (left && right) {
 else if (left && !right) {
 
   crawler.crawl(left,
-    { headers: argv.h, body: argv.b, username: argv.u, password: argv.p },
+    { headers: argv.H, body: argv.b, username: argv.u, password: argv.p },
     function(err, leftPages) {
 
     if (err) {
-      console.log("An error occured: " + err);
+      console.error("An error occured: " + err);
       process.exit(1);
     }
 
-    // output json
-    if (argv.j) {
-      console.log(JSON.stringify(leftPages));
+    // output pretty results
+    if (argv.P) {
+      console.log("Crawl results: \n".grey + prettyjson.render(leftPages));
     }
 
-    // output pretty results
+    // output json
     else {
-      console.log("Crawl results: \n".grey + prettyjson.render(leftPages));    
+      process.stdout.write(JSON.stringify(leftPages, null, 2));
     }
+
   });
 
 }
