@@ -7,7 +7,7 @@
     { "name": "Nick Crohn", "email": "nick@meltmedia.com" }
   ],
   "dependencies": {
-    "simplecrawler": "0.0.x",
+    "simplecrawler": "0.3.x",
     "first": "0.0.x",
     "mime": "1.2.x",
     "optimist": "0.3.x",
