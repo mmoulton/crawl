@@ -1,5 +1,7 @@
 # Crawl - a website crawler / differencer [![Build Status](https://travis-ci.org/mmoulton/crawl.png)](https://travis-ci.org/mmoulton/crawl)
 
+**NOTE:** This project is no longer being maintained by me. If you are interested in taking over maintenance of this project, let me know.
+
 Crawl, as it's name implies, will crawl around a website, discovering all of the links and their relationships starting from a base URL. The output of crawl is a JSON object representing a sitemap of every resource within a site, including each links outbound references and any inbound refferers.
 
 Crawl is a Node.js based library that can be used as a module within another application, or as a stand alone tool via it's command line interface (CLI).
