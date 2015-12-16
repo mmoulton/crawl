@@ -42,7 +42,7 @@ describe('crawler', function() {
 
     it('should difference 2 sites and return 1 page with no differences', function(done) {
       crawl.diff("http://127.0.0.1:8899", "http://127.0.0.1:8899", function(err, leftPages, rightPages, diffs) {
-        diffs.should.be.a('object').and.have.property('/');
+        diffs.should.be.type('object').and.have.property('/');
         diffs['/'].differences.should.be.false;
         done();
       });
@@ -52,7 +52,7 @@ describe('crawler', function() {
       crawl.diff(__dirname + "/assets/json/site1-left.json",
                  __dirname + "/assets/json/site1-right.json",
                  function(err, leftPages, rightPages, diffs) {
-        diffs.should.be.a('object').and.have.property('/');
+        diffs.should.be.type('object').and.have.property('/');
         diffs['/'].differences.should.be.false;
         done();
       });
@@ -62,7 +62,7 @@ describe('crawler', function() {
       crawl.diff(__dirname + "/assets/json/site2-left.json",
                  __dirname + "/assets/json/site2-right.json",
                  function(err, leftPages, rightPages, diffs) {
-        diffs.should.be.a('object').and.have.property('/');
+        diffs.should.be.type('object').and.have.property('/');
         diffs['/'].differences.should.be.true;
         done();
       });

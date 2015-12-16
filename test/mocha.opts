@@ -1,5 +1,4 @@
 --reporter spec
---ignore-leaks
 --require should
 --require colors
 --growl
